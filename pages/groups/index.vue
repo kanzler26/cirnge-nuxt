@@ -1,20 +1,20 @@
 <template>
   <div>
-      <v-data-table
-        :headers="datatables.groups.headers"
-        
-        :items="datatables.groups.items"
-        @update:options="getGroups"
-        @click:row="open"
-      >
-        <template #item.start="{ item }">
-          {{ item.start }}/{{ item.end }}
-        </template>
-      </v-data-table>
-      <edit-group-modal
-        :group-item="groupItem"
-        :dialog="dialog"
-      ></edit-group-modal>
+    <v-data-table
+      :headers="datatables.groups.headers"
+      :items="datatables.groups.items"
+      @update:options="getGroups"
+      @click:row="open"
+    >
+      <template #item.start="{ item }">
+        {{ item.start }}/{{ item.end }}
+      </template>
+    </v-data-table>
+    <edit-group-modal
+      :group-item="groupItem"
+      :open="dialog"
+      :change-group="changeGroup"
+    ></edit-group-modal>
   </div>
 </template>
 
@@ -35,7 +35,7 @@ export default Vue.extend({
   layout: 'admin',
   data: () => ({
     dialog: false,
-    groupItem: null,
+    groupItem: {},
     datatables: {
       groups: {
         loading: false,
@@ -106,10 +106,17 @@ export default Vue.extend({
       //   this.datatables.groups.items = data
       // }
     },
+    changeGroup(item: any) {
+      console.log("item:",item)
+    },
     open(item: any) {
       this.dialog = !this.dialog
-      this.groupItem = item
-      // console.log( "in open method:", item )
+      this.groupItem = {
+        item,
+        index: this.datatables.groups.items.indexOf(item),
+      }
+      // eslint-disable-next-line no-console
+      console.log('in open method:', this.groupItem)
     },
   },
 })
