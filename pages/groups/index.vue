@@ -107,7 +107,8 @@ export default Vue.extend({
       // }
     },
     changeGroup(item: any) {
-      console.log("item:",item)
+      // eslint-disable-next-line no-console
+      console.log('item:', item)
     },
     open(item: any) {
       this.dialog = !this.dialog

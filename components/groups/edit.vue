@@ -84,6 +84,7 @@ export default Vue.extend({
     },
   },
   methods: {
+    // сохранить кнопка
     initSave() {
       this.saved = true
       if (this.calcDate) {
@@ -94,15 +95,18 @@ export default Vue.extend({
       }
       this.closeEdit()
     },
+    // закрыть кнопка
     initClose() {
       this.closed = true
     },
+    // событие календаря, при изменении поля с датой
     saveChanges(date: any) {
       this.dialog = true
       this.calcDate = date
-      this.$emit("changeGroup",)
-      console.log("groupIndex:", this.groupIndex)
-      console.log("groupIndex from calc:", date)
+
+      this.$emit('changeGroup', { date, index: this.groupIndex })
+      // eslint-disable-next-line no-console
+      console.log('saveChanges:', { date, index: this.groupIndex })
     },
     closeEdit() {
       this.dialog = false
