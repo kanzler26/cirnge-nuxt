@@ -6,7 +6,8 @@
     required
   ></v-select>
 </template>
-// TODO:почему при вызове edit не появляется в селекте переданная пропса type group
+// TODO:почему при вызове edit не появляется в селекте переданная пропса type
+group
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
@@ -21,22 +22,17 @@ export default Vue.extend({
     types: ['очная', 'заочная', 'заочно-очная'],
     activType: '',
   }),
-  watch: {
-    activType: {
-      handler() {
-        console.log('activ type: ', this.activType)
-      },
-    },
-    typeVal: {
-      handler() {
-        this.activType = this.typeVal
-        console.log('typeVal: ', this.activType)
-      },
-    },
-    // mounted(){
-    //     this.activType = this.typeVal
-    //     console.log('typeVal: ', this.activType)
-    // }
+  // watch: {
+  //   typeVal: {
+  //     handler() {
+  //       this.activType = this.typeVal
+  //       console.log('typeVal: ', this.activType)
+  //     },
+  //   },
+  // },
+  mounted() {
+    this.activType = this.typeVal
+    console.log('typeVal: ', this.typeVal)
   },
 })
 </script>

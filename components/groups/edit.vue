@@ -16,10 +16,9 @@
               </v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <!-- <v-text-field v-model="form.type" label="Форма обучения">
-              </v-text-field> -->
-            <types-group :type-val="form.type" /> 
+              <types-group :type-val="form.type" />
             </v-col>
+            form type: {{ form.type }}
             <v-col cols="12" sm="6" md="4">
               <group-calendar
                 :date-gr="[form.start, form.end, groupIndex]"
@@ -53,7 +52,7 @@ export default Vue.extend({
   name: 'EditGroupModal',
   components: {
     'group-calendar': calendar,
-    'types-group':types
+    'types-group': types,
   },
   layout: 'admin',
   props: {
@@ -70,7 +69,6 @@ export default Vue.extend({
     menu: null,
     dialog: false,
     form: {} as Form,
-
     date: '',
     saved: false,
     closed: false,
