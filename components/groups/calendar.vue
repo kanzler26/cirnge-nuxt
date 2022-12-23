@@ -19,13 +19,18 @@
         v-on="on"
       ></v-text-field>
     </template>
-    <v-date-picker
-     v-model="date" range
-     @change="sendToEdit"> </v-date-picker>
+    <v-date-picker v-model="date" range @change="sendToEdit"> </v-date-picker>
   </v-menu>
 </template>
 <script>
 import Vue from 'vue'
+
+// const dateNow = new Date().toISOString().split('T')[0]
+// const day =  dateNow.getDay()
+// const month = dateNow.getMonth()
+// const year = dateNow.getFullYear()
+// const formatDate = year + '-' + month + '-' + day
+// const dateNowAddWeek = new Date(dateNow.setDate(dateNow.getDate() + 7))
 
 export default Vue.extend({
   name: 'GroupCalendar',
@@ -53,35 +58,34 @@ export default Vue.extend({
     closeDialog: false,
     groupIndex: null,
   }),
+
   watch: {
     menu(val) {
       val && setTimeout(() => (this.activePicker = 'YEAR'))
     },
-    // если меняется свойство, то передаём родителю данные
-    // saveChanges() {
-    //   this.$emit('saveChanges', this.closeDialog)
-    //   this.$emit('saveChanges', this.date)
-    //   this.$emit('saveChanges', this.groupIndex)
-    // },
     closeDialog() {
       this.$emit('closeEdit', this.closeDialog)
     },
   },
   mounted() {
     // при загрузке записали данные из пропсы
-    this.date.push(this.dateGr[0], this.dateGr[1])
+    // если есть данные из пропсы из компонента edit,
+    // тогда передаём в инпут, если нет то по умолчанию
+    if (this.dateGr.length > 0) {
+      this.date.push(this.dateGr[0], this.dateGr[1])
+      this.groupIndex = this.dateGr[2]
+    } else {
+      const dateObj = new Date()
+      const dateNow = new Date().toISOString().split('T')[0]
+      const dateNowAddWeek = new Date(dateObj.setDate(dateObj.getDate() + 7))
+        .toISOString()
+        .split('T')[0]
+      this.date.push(dateNow, dateNowAddWeek)
+    }
     this.saveChanges = this.saved
     this.closeDialog = this.closed
-    this.groupIndex = this.dateGr[2]
-    // eslint-disable-next-line no-console
-    console.log('mount ind:', this.dateGr)
   },
-  // TODO: че за хуйня
   methods: {
-    // save ( date ) {
-    //   this.$refs.menu.save( date )
-    //   console.log(date)
-    // },
     sendToEdit() {
       this.$emit('sendToEdit', this.date)
       // this.menu = true

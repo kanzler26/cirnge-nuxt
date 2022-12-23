@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog">
+  <v-dialog v-model="dialog" @click:outside="initClose">
     <v-card>
       <v-card-title>
         <span class="text-h5">Редактирование группы</span>
@@ -9,19 +9,20 @@
           <v-row>
             <v-col cols="12" sm="6" md="4">
               <v-text-field
-                v-model="groupName"
+                v-model="form.name"
                 prepend-icon=""
                 label="Название"
               >
               </v-text-field>
             </v-col>
             <v-col cols="12" sm="6" md="4">
-              <v-text-field v-model="groupType" label="Форма обучения">
-              </v-text-field>
+              <!-- <v-text-field v-model="form.type" label="Форма обучения">
+              </v-text-field> -->
+            <types-group :type-val="form.type" /> 
             </v-col>
             <v-col cols="12" sm="6" md="4">
               <group-calendar
-                :date-gr="[groupStart, groupEnd, groupIndex]"
+                :date-gr="[form.start, form.end, groupIndex]"
                 :saved="saved"
                 :closed="closed"
                 @sendToEdit="saveChanges"
@@ -38,17 +39,27 @@
 </template>
 <script lang="ts">
 import Vue from 'vue'
+import types from '@/components/groups/types.vue'
 import calendar from '@/components/groups/calendar.vue'
+export interface Form {
+  name: string
+  type: string
+  start: string
+  end: string
+}
+// добавить поле для выбора курсов чтобы при нажатии появился функционал Марка
+
 export default Vue.extend({
   name: 'EditGroupModal',
   components: {
     'group-calendar': calendar,
+    'types-group':types
   },
   layout: 'admin',
   props: {
-    groupItem: {
+    group: {
       type: Object,
-      default: () => null,
+      default: () => {},
     },
     open: {
       type: Boolean,
@@ -58,11 +69,8 @@ export default Vue.extend({
   data: () => ({
     menu: null,
     dialog: false,
-    // editItem:{},
-    groupName: '',
-    groupType: '',
-    groupStart: '',
-    groupEnd: '',
+    form: {} as Form,
+
     date: '',
     saved: false,
     closed: false,
@@ -73,40 +81,33 @@ export default Vue.extend({
     open(val) {
       this.dialog = val
     },
-    groupItem: {
-      handler(val) {
-        this.groupName = val.item.name
-        this.groupType = val.item.type
-        this.groupStart = val.item.start
-        this.groupEnd = val.item.end
-        this.groupIndex = val.index
+    group: {
+      handler() {
+        this.groupIndex = this.group.index
+        Object.assign(this.form, this.group.item)
       },
     },
   },
   methods: {
     // сохранить кнопка
     initSave() {
-      this.saved = true
-      if (this.calcDate) {
-        this.groupStart = this.calcDate[0]
-        this.groupEnd = this.calcDate[1]
-        // eslint-disable-next-line no-console
-        console.log('wtf', this.groupEnd)
-      }
-      this.closeEdit()
+      this.initClose()
+      this.$emit('changeGroup', {
+        index: this.groupIndex,
+        form: this.form,
+      })
     },
+
     // закрыть кнопка
     initClose() {
-      this.closed = true
+      this.closeEdit()
+      this.$emit('closeEdit')
     },
     // событие календаря, при изменении поля с датой
     saveChanges(date: any) {
       this.dialog = true
-      this.calcDate = date
-
-      this.$emit('changeGroup', { date, index: this.groupIndex })
-      // eslint-disable-next-line no-console
-      console.log('saveChanges:', { date, index: this.groupIndex })
+      this.form.start = date[0]
+      this.form.end = date[1]
     },
     closeEdit() {
       this.dialog = false

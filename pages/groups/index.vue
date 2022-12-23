@@ -1,19 +1,29 @@
 <template>
   <div>
+    <v-btn @click="openModalCreate">
+      <v-icon> mdi-account-multiple-plus-outline </v-icon>
+      <create-group-modal
+        :open-modal-prop="openModal"
+        @saveChanges="saveCreateGroup"
+        @closeGroupModal="closeCreateModal"
+      >
+      </create-group-modal>
+    </v-btn>
     <v-data-table
       :headers="datatables.groups.headers"
       :items="datatables.groups.items"
       @update:options="getGroups"
-      @click:row="open"
+      @click:row="openEditor"
     >
       <template #item.start="{ item }">
         {{ item.start }}/{{ item.end }}
       </template>
     </v-data-table>
     <edit-group-modal
-      :group-item="groupItem"
+      :group="group"
       :open="dialog"
-      :change-group="changeGroup"
+      @changeGroup="changeGroup"
+      @closeEdit="closeEdit"
     ></edit-group-modal>
   </div>
 </template>
@@ -23,19 +33,18 @@ import Vue from 'vue'
 // import { GroupsApiPayload } from "~/plugins/api/groups/groups.type"
 // import { DataModalStructure } from "~/types/components/modal"
 import edit from '~/components/groups/edit.vue'
-
-// interface ModalGroupsProps {
-//   groupId: number
-// }
+import create from '~/components/groups/create.vue'
 export default Vue.extend({
   name: 'GroupIndexPage',
   components: {
     'edit-group-modal': edit,
+    'create-group-modal': create,
   },
   layout: 'admin',
   data: () => ({
     dialog: false,
-    groupItem: {},
+    openModal: false,
+    group: {},
     datatables: {
       groups: {
         loading: false,
@@ -88,12 +97,6 @@ export default Vue.extend({
         itemsPerPage: 20,
       },
     },
-    // modals: {
-    //   counterpartiesCreate: {
-    //     display: false,
-    //     props: {},
-    //   } as DataModalStructure<ModalGroupsProps>,
-    // },
   }),
   head: () => ({
     title: 'Группы',
@@ -107,17 +110,36 @@ export default Vue.extend({
       // }
     },
     changeGroup(item: any) {
-      // eslint-disable-next-line no-console
-      console.log('item:', item)
+      // TODO: переделать на норм инициализацию
+      this.datatables.groups.items[item.index].start = item.form.start
+      this.datatables.groups.items[item.index].end = item.form.end
+      this.datatables.groups.items[item.index].type = item.form.type
+      this.datatables.groups.items[item.index].name = item.form.name
+      //  this.dialog = item.dialog
     },
-    open(item: any) {
+
+    openEditor(item: any) {
       this.dialog = !this.dialog
-      this.groupItem = {
-        item,
+      this.group = {
         index: this.datatables.groups.items.indexOf(item),
+        item,
       }
-      // eslint-disable-next-line no-console
-      console.log('in open method:', this.groupItem)
+    },
+
+    closeEdit() {
+      this.dialog = false
+    },
+
+    openModalCreate() {
+      this.openModal = true
+    },
+
+    closeCreateModal() {
+      this.openModal = false
+    },
+    saveCreateGroup(group: any) {
+      this.openModal = group.close
+      this.datatables.groups.items.push(group.item)
     },
   },
 })
